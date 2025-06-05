@@ -1,4 +1,4 @@
-package Arduino.Ponto_RFID.Controller;
+package Arduino.PontoRFID.Controller;
 
 import java.util.List;
 
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import Arduino.Ponto_RFID.Model.RegistroPonto;
-import Arduino.Ponto_RFID.Repository.RegistroPontoRepository;
+import Arduino.PontoRFID.Model.RegistroPonto;
+import Arduino.PontoRFID.Repository.RegistroPontoRepository;
 
 @RestController
 @RequestMapping("/historico")

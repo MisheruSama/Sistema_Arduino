@@ -1,8 +1,8 @@
-package Arduino.Ponto_RFID.Repository;
+package Arduino.PontoRFID.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import Arduino.Ponto_RFID.Model.Funcionario;
+import Arduino.PontoRFID.Model.Funcionario;
 
 public interface FuncionarioRepository extends JpaRepository<Funcionario, String>{
 }

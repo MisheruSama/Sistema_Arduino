@@ -1,10 +1,10 @@
-package Arduino.Ponto_RFID.Repository;
+package Arduino.PontoRFID.Repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import Arduino.Ponto_RFID.Model.RegistroPonto;
+import Arduino.PontoRFID.Model.RegistroPonto;
 
 public interface RegistroPontoRepository extends JpaRepository<RegistroPonto, Long>{
 

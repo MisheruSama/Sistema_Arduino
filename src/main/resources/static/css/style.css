@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+body {
+    background-color: #000;
+    color: #0a2342;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header, footer, nav, .card, .button, input, textarea, select {
+    background-color: #0a2342;
+    color: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    border: none;
+}
+
+a {
+    color: #1976d2;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #63a4ff;
+}
+
+.button, button {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.2s;
+}
+
+.button:hover, button:hover {
+    background: #1565c0;
+}
+
+input, textarea, select {
+    background: #021024;
+    color: #fff;
+    border: 1px solid #1976d2;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+::-webkit-input-placeholder { color: #63a4ff; }
+::-moz-placeholder { color: #63a4ff; }
+:-ms-input-placeholder { color: #63a4ff; }
+::placeholder { color: #63a4ff; }

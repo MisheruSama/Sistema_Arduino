@@ -1,4 +1,4 @@
-package Arduino.Ponto_RFID.Model;
+package Arduino.PontoRFID.Model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
