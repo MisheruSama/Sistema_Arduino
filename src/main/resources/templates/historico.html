@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Registro de Ponto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div style="max-width: 900px; margin: 40px auto; padding: 20px;">
+        <h1>Histórico de Registro de Ponto</h1>
+        <form id="searchForm" onsubmit="buscarRegistros(event)" style="margin-bottom: 20px;">
+            <label for="nome">Buscar por nome:</label>
+            <input type="text" id="nome" name="nome" placeholder="Digite o nome">
+            <button type="submit">Buscar</button>
+        </form>
+
+        <div style="overflow-x:auto;">
+            <table id="tabelaHistorico" style="width:100%; border-collapse: collapse; min-width: 600px;">
+                <thead>
+                    <tr style="background-color: #000000;">
+                        <th style="padding: 10px; border: 1px solid #ddd;">Data</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Horário</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Status</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Nome</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Registros serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function buscarRegistros(event) {
+            event.preventDefault();
+            const nome = document.getElementById('nome').value;
+            // Ajuste a URL abaixo para o endpoint correto do seu backend
+            const response = await fetch(`/api/historico?nome=${encodeURIComponent(nome)}`);
+            const registros = await response.json();
+
+            const tbody = document.querySelector('#tabelaHistorico tbody');
+            tbody.innerHTML = '';
+            registros.forEach(registro => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${registro.data}</td>
+                    <td>${registro.horario}</td>
+                    <td>${registro.status}</td>
+                    <td>${registro.nome}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Carrega todos os registros ao abrir a página
+        window.onload = buscarRegistros;
+    </script>
+</body>
+</html>

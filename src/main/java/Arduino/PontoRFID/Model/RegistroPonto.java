@@ -3,6 +3,7 @@ package Arduino.PontoRFID.Model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,11 +26,12 @@ import lombok.Setter;
 public class RegistroPonto {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "data_de_registro")
     private LocalDate dataderegistro;
     private LocalTime horario;
     private String status;
     
-    @ManyToOne @JoinColumn(name = "RFID_UID")
+    @ManyToOne @JoinColumn(name = "fk_Funcionario_RFID_UID")
     private Funcionario funcionario;
     
     

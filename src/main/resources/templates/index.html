@@ -8,10 +8,253 @@
 </head>
 <header>
     <h1>
-        SISTEMA DE PONTO AUTOMATIZADO
+        RFID WORKPOINT
     </h1>
 </header>
 <body>
+    <div class="table-container">
+        <table border="1" style="width:100%; border-collapse: collapse; margin: 0 auto;">
+            <thead>
+            <tr style="background-color: #000000;">
+                <th>UID</th>
+                <th>Nome</th>
+                <th>Cargo</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody id="funcionarios-tbody">
+            <!-- Dados preenchidos via JavaScript -->
+            </tbody>
+        </table>
+        <div style="margin-top: 16px; display: flex; justify-content: center; gap: 8px;">
+            <button id="cadastrar-btn">Cadastrar</button>
+            <button id="historico-btn">Histórico de Registro</button>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Carregar funcionários
+        function carregarFuncionarios() {
+            fetch('/api/funcionarios')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('funcionarios-tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(item => {
+                        const tr = document.createElement('tr');
+
+                        const tdUid = document.createElement('td');
+                        tdUid.textContent = item.rfiduid;
+                        tdUid.style.padding = '8px';
+
+                        const tdNome = document.createElement('td');
+                        tdNome.textContent = item.nome;
+                        tdNome.style.padding = '8px';
+
+                        const tdCargo = document.createElement('td');
+                        tdCargo.textContent = item.cargo;
+                        tdCargo.style.padding = '8px';
+
+                        const tdAcoes = document.createElement('td');
+                        tdAcoes.style.padding = '8px';
+
+                        // Container para os botões lado a lado
+                        const btnContainer = document.createElement('div');
+                        btnContainer.style.display = 'flex';
+                        btnContainer.style.gap = '8px';
+
+                        const editBtn = document.createElement('button');
+                        editBtn.textContent = 'Editar';
+                        editBtn.className = 'edit-btn';
+                        editBtn.onclick = function() {
+                            mostrarFormularioEdicao(item);
+                        };
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = 'Excluir';
+                        deleteBtn.className = 'delete-btn';
+                        deleteBtn.onclick = function() {
+                            if (confirm('Tem certeza que deseja excluir este funcionário?')) {
+                                fetch(`/api/funcionarios/deletar`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        rfiduid: item.rfiduid,
+                                        nome: item.nome,
+                                        cargo: item.cargo
+                                    })
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        carregarFuncionarios();
+                                    } else {
+                                        alert('Erro ao excluir funcionário.');
+                                    }
+                                });
+                            }
+                        };
+
+                        btnContainer.appendChild(editBtn);
+                        btnContainer.appendChild(deleteBtn);
+
+                        tdAcoes.appendChild(btnContainer);
+
+                        tr.appendChild(tdUid);
+                        tr.appendChild(tdNome);
+                        tr.appendChild(tdCargo);
+                        tr.appendChild(tdAcoes);
+
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar dados:', error);
+                });
+        }
+
+        // Função para ativar o sensor RFID e obter o UID
+        function ativarSensorRFID(callback) {
+            fetch('/api/rfid/ativar', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'aguardando') {
+                        // Polling para buscar o UID lido
+                        const interval = setInterval(() => {
+                            fetch('/api/rfid/uid')
+                                .then(resp => resp.json())
+                                .then(uidData => {
+                                    if (uidData.uid) {
+                                        clearInterval(interval);
+                                        callback(uidData.uid);
+                                    }
+                                });
+                        }, 1000);
+                    } else {
+                        alert('Erro ao ativar sensor RFID.');
+                    }
+                })
+                .catch(() => {
+                    alert('Erro ao comunicar com o sensor RFID.');
+                });
+        }
+
+        // Formulário para cadastro
+        function mostrarFormularioCadastro() {
+            let formHtml = `
+                <form id="cadastro-form" style="margin: 16px 0; display: flex; gap: 8px; align-items: center;">
+                    <input type="text" id="rfiduid-input" name="rfiduid" placeholder="Aproxime o cartão RFID..." required readonly>
+                    <button type="button" id="ler-uid-btn">Ler UID</button>
+                    <input type="text" name="nome" placeholder="Nome" required>
+                    <input type="text" name="cargo" placeholder="Cargo" required>
+                    <button type="submit">Cadastrar</button>
+                    <button type="button" id="cancelar-cadastro-btn">Cancelar</button>
+                </form>
+            `;
+            let container = document.getElementById('form-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'form-container';
+                document.body.insertBefore(container, document.body.children[1]);
+            }
+            container.innerHTML = formHtml;
+
+            // Botão para ler UID do sensor
+            document.getElementById('ler-uid-btn').onclick = function() {
+                const btn = this;
+                btn.disabled = true;
+                btn.textContent = 'Aguardando cartão...';
+                ativarSensorRFID(function(uid) {
+                    document.getElementById('rfiduid-input').value = uid;
+                    btn.textContent = 'Ler UID';
+                    btn.disabled = false;
+                });
+            };
+
+            document.getElementById('cadastro-form').onsubmit = function(e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                if (!data.rfiduid) {
+                    alert('Por favor, leia o UID do cartão RFID.');
+                    return;
+                }
+
+                fetch('/api/funcionarios/cadastrar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        container.innerHTML = '';
+                        carregarFuncionarios();
+                    } else {
+                        alert('Erro ao cadastrar funcionário.');
+                    }
+                });
+            };
+
+            document.getElementById('cancelar-cadastro-btn').onclick = function() {
+                container.innerHTML = '';
+            };
+        }
+
+        // Formulário para edição
+        function mostrarFormularioEdicao(funcionario) {
+            let formHtml = `
+                <form id="edicao-form" style="margin: 16px 0; display: flex; gap: 8px; align-items: center;">
+                    <input type="text" name="rfiduid" placeholder="UID" value="${funcionario.rfiduid}" readonly required>
+                    <input type="text" name="nome" placeholder="Nome" value="${funcionario.nome}" required>
+                    <input type="text" name="cargo" placeholder="Cargo" value="${funcionario.cargo}" required>
+                    <button type="submit">Salvar</button>
+                    <button type="button" id="cancelar-edicao-btn">Cancelar</button>
+                </form>
+            `;
+            let container = document.getElementById('form-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'form-container';
+                document.body.insertBefore(container, document.body.children[1]);
+            }
+            container.innerHTML = formHtml;
+
+            document.getElementById('edicao-form').onsubmit = function(e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                fetch('/api/funcionarios/editar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        container.innerHTML = '';
+                        carregarFuncionarios();
+                    } else {
+                        alert('Erro ao salvar funcionário.');
+                    }
+                });
+            };
+
+            document.getElementById('cancelar-edicao-btn').onclick = function() {
+                container.innerHTML = '';
+            };
+        }
+
+        // Botão cadastrar
+        document.getElementById('cadastrar-btn').onclick = function() {
+            mostrarFormularioCadastro();
+        };
+
+        carregarFuncionarios();
+    });
+    document.getElementById('historico-btn').onclick = function() {
+        window.location.href = '/historico';
+    };
     
+</script>
 </body>
 </html>

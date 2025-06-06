@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
 body {
-    background-color: #000;
-    color: #0a2342;
+    background-color: #250396;
+    color: #ffffff;
     font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -10,7 +10,7 @@ body {
 
 header, footer, nav, .card, .button, input, textarea, select {
     background-color: #0a2342;
-    color: #fff;
+    color: #000000;
     border-radius: 8px;
     padding: 16px;
     margin: 16px 0;
@@ -57,3 +57,8 @@ input, textarea, select {
 ::-moz-placeholder { color: #63a4ff; }
 :-ms-input-placeholder { color: #63a4ff; }
 ::placeholder { color: #63a4ff; }
+h1, h2, h3, h4, h5, h6, strong, b {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #fff;
+}

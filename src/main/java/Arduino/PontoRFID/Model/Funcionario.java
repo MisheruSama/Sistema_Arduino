@@ -22,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Funcionario {
     // Indica o identificador da entidade e a coluna correspondente no banco de dados
-    @Id @Column(name = "RFID_UID")
+    @Id @Column(name = "rfid_uid")
     private String rfiduid;
     private String nome;
     private String cargo;
