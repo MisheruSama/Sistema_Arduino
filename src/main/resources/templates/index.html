@@ -2,259 +2,290 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel = "stylesheet" href = "/css/style.css">
+    <title>RFID Workpoint</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            background: #181c2f;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #232a47;
+            border-radius: 10px;
+            box-shadow: 0 4px 24px #0004;
+            padding: 32px 32px 24px 32px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 32px;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #181c2f;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 14px 10px;
+            text-align: center;
+        }
+        th {
+            background: #22127d;
+            color: #fff;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #232a47;
+        }
+        tr:hover {
+            background: #2e3560;
+        }
+        .actions {
+            margin: 32px 0 0 0;
+            text-align: center;
+        }
+        .actions button {
+            background: #22127d;
+            color: #fff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin: 0 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .actions button:hover {
+            background: #3a2fcf;
+        }
+        #formulario-cadastro {
+            display: none;
+            justify-content: center;
+            margin-top: 32px;
+        }
+        #form-cadastro {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: #22127d;
+            padding: 28px 24px;
+            border-radius: 8px;
+            min-width: 320px;
+        }
+        #form-cadastro input {
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            font-size: 1rem;
+        }
+        #form-cadastro input:focus {
+            outline: 2px solid #3a2fcf;
+        }
+        #form-cadastro .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        #form-cadastro button {
+            background: #fff;
+            color: #22127d;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        #form-cadastro button:hover {
+            background: #3a2fcf;
+            color: #fff;
+        }
+        #mensagem-cadastro {
+            color: #fff;
+            min-height: 20px;
+            text-align: center;
+            margin-top: 8px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px 2vw;
+            }
+            #form-cadastro {
+                min-width: 0;
+            }
+        }
+    </style>
 </head>
-<header>
-    <h1>
-        RFID WORKPOINT
-    </h1>
-</header>
 <body>
-    <div class="table-container">
-        <table border="1" style="width:100%; border-collapse: collapse; margin: 0 auto;">
+    <div class="container">
+        <h1>RFID WORKPOINT</h1>
+
+        <table id="tabela-funcionarios">
             <thead>
-            <tr style="background-color: #000000;">
-                <th>UID</th>
-                <th>Nome</th>
-                <th>Cargo</th>
-                <th>Ações</th>
-            </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                </tr>
             </thead>
             <tbody id="funcionarios-tbody">
-            <!-- Dados preenchidos via JavaScript -->
+                <!-- Populado pelo JS -->
             </tbody>
         </table>
-        <div style="margin-top: 16px; display: flex; justify-content: center; gap: 8px;">
-            <button id="cadastrar-btn">Cadastrar</button>
-            <button id="historico-btn">Histórico de Registro</button>
+
+        <div class="actions">
+            <button onclick="mostrarFormulario()">Cadastrar</button>
+            <button onclick="window.location.href='/historico'">Histórico de Registro</button>
         </div>
-    </div>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Carregar funcionários
-        function carregarFuncionarios() {
-            fetch('/api/funcionarios')
-                .then(response => response.json())
-                .then(data => {
+
+        <div id="formulario-cadastro">
+            <form id="form-cadastro" autocomplete="off">
+            <input type="text" id="rfiduid" name="rfiduid" placeholder="UID" required>
+            <input type="text" id="nome" name="nome" placeholder="Nome" required>
+            <input type="text" id="cargo" name="cargo" placeholder="Cargo" required>
+            <div class="form-buttons">
+                <button type="submit" id="btn-salvar">Salvar</button>
+                <button type="button" onclick="esconderFormulario()">Cancelar</button>
+            </div>
+            <span id="mensagem-cadastro"></span>
+            </form>
+        </div>
+        </div>
+
+        <script>
+        // Funções de UI
+        function mostrarFormulario() {
+            document.getElementById('formulario-cadastro').style.display = 'flex';
+            document.getElementById('mensagem-cadastro').textContent = '';
+        }
+
+        function esconderFormulario() {
+            document.getElementById('formulario-cadastro').style.display = 'none';
+            document.getElementById('form-cadastro').reset();
+            document.getElementById('mensagem-cadastro').textContent = '';
+        }
+
+        // Função para listar funcionários
+        async function listarFuncionarios() {
+            try {
+            const response = await fetch('/api/funcionarios');
+            if (!response.ok) throw new Error('Erro ao carregar funcionários');
+            
+            const data = await response.json();
+            const tbody = document.getElementById('funcionarios-tbody');
+            tbody.innerHTML = '';
+            
+            data.forEach(func => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${func.uid || func.rfiduid}</td>
+                <td>${func.nome}</td>
+                <td>${func.cargo}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            } catch (error) {
+            console.error('Erro ao listar funcionários:', error);
+            }
+        }
+
+        // Função para cadastrar funcionário
+        async function cadastrarFuncionario(funcionario) {
+            try {
+            const response = await fetch('/api/funcionarios/cadastrar', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(funcionario)
+            });
+
+            if (!response.ok) throw new Error('Erro ao cadastrar');
+            
+            document.getElementById('mensagem-cadastro').textContent = 'Cadastrado com sucesso!';
+            setTimeout(() => {
+                esconderFormulario();
+                listarFuncionarios();
+            }, 1000);
+            } catch (error) {
+            document.getElementById('mensagem-cadastro').textContent = 'Erro ao cadastrar!';
+            console.error('Erro ao cadastrar:', error);
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('form-cadastro').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const funcionario = {
+                rfiduid: document.getElementById('rfiduid').value.trim(),
+                nome: document.getElementById('nome').value.trim(),
+                cargo: document.getElementById('cargo').value.trim()
+            };
+
+            if (!funcionario.rfiduid || !funcionario.nome || !funcionario.cargo) {
+                document.getElementById('mensagem-cadastro').textContent = 'Preencha todos os campos!';
+                return;
+            }
+
+            await cadastrarFuncionario(funcionario);
+            });
+
+            listarFuncionarios();
+        });
+
+
+            // Função para excluir funcionário
+            async function excluir(uid) {
+                if (!confirm('Deseja realmente excluir este funcionário?')) return;
+                
+                try {
+                    const response = await fetch(`/api/funcionarios/deletar/${uid}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) throw new Error('Erro ao excluir');
+                    listarFuncionarios();
+                } catch (error) {
+                    console.error('Erro ao excluir:', error);
+                }
+            }
+
+            // Modifica a função listarFuncionarios para incluir os botões
+            async function listarFuncionarios() {
+                try {
+                    const response = await fetch('/api/funcionarios');
+                    if (!response.ok) throw new Error('Erro ao carregar funcionários');
+                    
+                    const data = await response.json();
                     const tbody = document.getElementById('funcionarios-tbody');
                     tbody.innerHTML = '';
-                    data.forEach(item => {
-                        const tr = document.createElement('tr');
+                    
+                    data.forEach(func => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${func.rfiduid}</td>
+                            <td>${func.nome}</td>
+                            <td>${func.cargo}</td>
+                            <td>
 
-                        const tdUid = document.createElement('td');
-                        tdUid.textContent = item.rfiduid;
-                        tdUid.style.padding = '8px';
-
-                        const tdNome = document.createElement('td');
-                        tdNome.textContent = item.nome;
-                        tdNome.style.padding = '8px';
-
-                        const tdCargo = document.createElement('td');
-                        tdCargo.textContent = item.cargo;
-                        tdCargo.style.padding = '8px';
-
-                        const tdAcoes = document.createElement('td');
-                        tdAcoes.style.padding = '8px';
-
-                        // Container para os botões lado a lado
-                        const btnContainer = document.createElement('div');
-                        btnContainer.style.display = 'flex';
-                        btnContainer.style.gap = '8px';
-
-                        const editBtn = document.createElement('button');
-                        editBtn.textContent = 'Editar';
-                        editBtn.className = 'edit-btn';
-                        editBtn.onclick = function() {
-                            mostrarFormularioEdicao(item);
-                        };
-
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.textContent = 'Excluir';
-                        deleteBtn.className = 'delete-btn';
-                        deleteBtn.onclick = function() {
-                            if (confirm('Tem certeza que deseja excluir este funcionário?')) {
-                                fetch(`/api/funcionarios/deletar`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        rfiduid: item.rfiduid,
-                                        nome: item.nome,
-                                        cargo: item.cargo
-                                    })
-                                })
-                                .then(response => {
-                                    if (response.ok) {
-                                        carregarFuncionarios();
-                                    } else {
-                                        alert('Erro ao excluir funcionário.');
-                                    }
-                                });
-                            }
-                        };
-
-                        btnContainer.appendChild(editBtn);
-                        btnContainer.appendChild(deleteBtn);
-
-                        tdAcoes.appendChild(btnContainer);
-
-                        tr.appendChild(tdUid);
-                        tr.appendChild(tdNome);
-                        tr.appendChild(tdCargo);
-                        tr.appendChild(tdAcoes);
-
-                        tbody.appendChild(tr);
+                                <button onclick="excluir('${func.uid || func.rfiduid}')" style="background:#7d1212;">Excluir</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
                     });
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar dados:', error);
-                });
-        }
-
-        // Função para ativar o sensor RFID e obter o UID
-        function ativarSensorRFID(callback) {
-            fetch('/api/rfid/ativar', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'aguardando') {
-                        // Polling para buscar o UID lido
-                        const interval = setInterval(() => {
-                            fetch('/api/rfid/uid')
-                                .then(resp => resp.json())
-                                .then(uidData => {
-                                    if (uidData.uid) {
-                                        clearInterval(interval);
-                                        callback(uidData.uid);
-                                    }
-                                });
-                        }, 1000);
-                    } else {
-                        alert('Erro ao ativar sensor RFID.');
-                    }
-                })
-                .catch(() => {
-                    alert('Erro ao comunicar com o sensor RFID.');
-                });
-        }
-
-        // Formulário para cadastro
-        function mostrarFormularioCadastro() {
-            let formHtml = `
-                <form id="cadastro-form" style="margin: 16px 0; display: flex; gap: 8px; align-items: center;">
-                    <input type="text" id="rfiduid-input" name="rfiduid" placeholder="Aproxime o cartão RFID..." required readonly>
-                    <button type="button" id="ler-uid-btn">Ler UID</button>
-                    <input type="text" name="nome" placeholder="Nome" required>
-                    <input type="text" name="cargo" placeholder="Cargo" required>
-                    <button type="submit">Cadastrar</button>
-                    <button type="button" id="cancelar-cadastro-btn">Cancelar</button>
-                </form>
-            `;
-            let container = document.getElementById('form-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'form-container';
-                document.body.insertBefore(container, document.body.children[1]);
-            }
-            container.innerHTML = formHtml;
-
-            // Botão para ler UID do sensor
-            document.getElementById('ler-uid-btn').onclick = function() {
-                const btn = this;
-                btn.disabled = true;
-                btn.textContent = 'Aguardando cartão...';
-                ativarSensorRFID(function(uid) {
-                    document.getElementById('rfiduid-input').value = uid;
-                    btn.textContent = 'Ler UID';
-                    btn.disabled = false;
-                });
-            };
-
-            document.getElementById('cadastro-form').onsubmit = function(e) {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const data = Object.fromEntries(formData.entries());
-
-                if (!data.rfiduid) {
-                    alert('Por favor, leia o UID do cartão RFID.');
-                    return;
+                } catch (error) {
+                    console.error('Erro ao listar funcionários:', error);
                 }
-
-                fetch('/api/funcionarios/cadastrar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        container.innerHTML = '';
-                        carregarFuncionarios();
-                    } else {
-                        alert('Erro ao cadastrar funcionário.');
-                    }
-                });
-            };
-
-            document.getElementById('cancelar-cadastro-btn').onclick = function() {
-                container.innerHTML = '';
-            };
-        }
-
-        // Formulário para edição
-        function mostrarFormularioEdicao(funcionario) {
-            let formHtml = `
-                <form id="edicao-form" style="margin: 16px 0; display: flex; gap: 8px; align-items: center;">
-                    <input type="text" name="rfiduid" placeholder="UID" value="${funcionario.rfiduid}" readonly required>
-                    <input type="text" name="nome" placeholder="Nome" value="${funcionario.nome}" required>
-                    <input type="text" name="cargo" placeholder="Cargo" value="${funcionario.cargo}" required>
-                    <button type="submit">Salvar</button>
-                    <button type="button" id="cancelar-edicao-btn">Cancelar</button>
-                </form>
-            `;
-            let container = document.getElementById('form-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'form-container';
-                document.body.insertBefore(container, document.body.children[1]);
             }
-            container.innerHTML = formHtml;
-
-            document.getElementById('edicao-form').onsubmit = function(e) {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const data = Object.fromEntries(formData.entries());
-
-                fetch('/api/funcionarios/editar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        container.innerHTML = '';
-                        carregarFuncionarios();
-                    } else {
-                        alert('Erro ao salvar funcionário.');
-                    }
-                });
-            };
-
-            document.getElementById('cancelar-edicao-btn').onclick = function() {
-                container.innerHTML = '';
-            };
-        }
-
-        // Botão cadastrar
-        document.getElementById('cadastrar-btn').onclick = function() {
-            mostrarFormularioCadastro();
-        };
-
-        carregarFuncionarios();
-    });
-    document.getElementById('historico-btn').onclick = function() {
-        window.location.href = '/historico';
-    };
-    
-</script>
+        </script>
 </body>
 </html>

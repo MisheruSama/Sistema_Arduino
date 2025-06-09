@@ -11,21 +11,17 @@ import Arduino.PontoRFID.Model.RegistroPonto;
 import Arduino.PontoRFID.Repository.RegistroPontoRepository;
 
 @RestController
-@RequestMapping("/historico")
+@RequestMapping("/api/historico")
 public class RegistroController {
 
     @Autowired
     private RegistroPontoRepository registroPontoRepository;
 
-    @GetMapping("/historico/api")
+    @GetMapping
     public List<RegistroPonto> listarRegistro(){
         List<RegistroPonto> registros = registroPontoRepository.findAll();
         return registros;
     }
 
-    @GetMapping("/historico/encontrar/{uid}")
-    public List<RegistroPonto> encontrarRegistroPorNome(String nome) {
-        List<RegistroPonto> registrosPorNome = registroPontoRepository.findByFuncionarioNome(nome);
-        return registrosPorNome;
-    }
+
 }
