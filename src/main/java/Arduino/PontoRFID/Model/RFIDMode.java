@@ -1,15 +1,25 @@
 package Arduino.PontoRFID.Model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.stereotype.Component;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Component
 public class RFIDMode {
-    private boolean cadastro;
-    private boolean leitura;
+    private boolean cadastro = false;
+    private String ultimoRfidUid;
+    public boolean isCadastro() {
+        return cadastro;
+    }
+
+    public void setCadastro(boolean cadastro) {
+        this.cadastro = cadastro;
+    }
+
+    public String getUltimoRfidUid() {
+        return ultimoRfidUid;
+    }
+
+    public void setUltimoRfidUid(String ultimoRfidUid) {
+        this.ultimoRfidUid = ultimoRfidUid;
+    }
+
 }
