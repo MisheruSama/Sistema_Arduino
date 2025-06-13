@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Registro_Ponto")
+@Table(name = "registroponto")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -35,7 +35,7 @@ public class RegistroPonto {
     private String status;
     
     @ManyToOne(fetch = FetchType.EAGER)   
-     @JoinColumn(name = "fk_Funcionario_RFID_UID")
+     @JoinColumn(name = "fk_Funcionario_rfiduid")
     @JsonIgnoreProperties("registros")
     private Funcionario funcionario;
     

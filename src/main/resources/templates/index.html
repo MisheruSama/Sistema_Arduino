@@ -161,143 +161,115 @@
             </div>
             </div>
 
-            <script>
-            // Mostrar e esconder o formulário de cadastro
-            function mostrarFormulario() {
-                document.getElementById('formulario-cadastro').style.display = 'flex';
-                document.getElementById('mensagem-cadastro').textContent = '';
-            }
+             <script>
+                        // Mostrar e esconder o formulário de cadastro
+                        function mostrarFormulario() {
+                            document.getElementById('formulario-cadastro').style.display = 'flex';
+                            document.getElementById('mensagem-cadastro').textContent = '';
+                        }
 
-            function esconderFormulario() {
-                document.getElementById('formulario-cadastro').style.display = 'none';
-                document.getElementById('form-cadastro').reset();
-                document.getElementById('mensagem-cadastro').textContent = '';
-            }
+                        function esconderFormulario() {
+                            document.getElementById('formulario-cadastro').style.display = 'none';
+                            document.getElementById('form-cadastro').reset();
+                            document.getElementById('mensagem-cadastro').textContent = '';
+                        }
 
-            // Ativar modo cadastro no backend e abrir formulário
-            async function ativarModoCadastro() {
-                try {
-                const resp = await fetch('/api/funcionarios/modoCadastro', {
-                    method: 'POST'
-                });
-                if (!resp.ok) throw new Error('Não foi possível ativar o modo cadastro');
+                        // Ativar modo cadastro no backend e abrir formulário
+                        async function ativarModoCadastro() {
+                            mostrarFormulario();
+                        }
 
-                mostrarFormulario();
+                        
 
-                // Atualizar UID inicialmente e depois a cada 2 segundos para pegar o cartão lido
-                await atualizarUid();
-                if (window.uidInterval) clearInterval(window.uidInterval);
-                window.uidInterval = setInterval(atualizarUid, 2000);
+                        // Listar funcionários na tabela
+                        async function listarFuncionarios() {
+                            try {
+                            const resp = await fetch('/api/funcionarios');
+                            if (!resp.ok) throw new Error('Erro ao carregar funcionários');
+                            const data = await resp.json();
+                            const tbody = document.getElementById('funcionarios-tbody');
+                            tbody.innerHTML = '';
 
-                document.getElementById('mensagem-cadastro').textContent = 'Modo cadastro ativado! Aproxime o cartão para ler o UID.';
-                } catch (err) {
-                alert(err.message);
-                }
-            }
+                            data.forEach(f => {
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                <td>${f.rfiduid}</td>
+                                <td>${f.nome}</td>
+                                <td>${f.cargo}</td>
+                                <td><button style="background:#7d1212" onclick="excluir('${f.rfiduid}')">Excluir</button></td>
+                                `;
+                                tbody.appendChild(tr);
+                            });
+                            } catch (err) {
+                            console.error(err);
+                            }
+                        }
 
-            // Buscar último UID lido do backend para preencher no input readonly
-            async function atualizarUid() {
-                try {
-                const resp = await fetch('/api/funcionarios/ultimoUid');
-                if (resp.status === 204) { // Nenhum UID lido ainda
-                    document.getElementById('rfiduid').value = '';
-                    return;
-                }
-                if (!resp.ok) throw new Error('Erro ao buscar UID');
+                       async function excluir(uid) {
+                            if (!confirm('Deseja realmente excluir este funcionário?')) return;
+                            try {
+                                const resp = await fetch(`/api/funcionarios/deletar/${uid}`, {
+                                    method: 'DELETE',
+                                });
 
-                const uid = await resp.text();
-                document.getElementById('rfiduid').value = uid;
-                } catch (err) {
-                console.error('Erro ao atualizar UID:', err);
-                }
-            }
+                                if (resp.ok) {
+                                    listarFuncionarios();
+                                    alert('Funcionário excluído com sucesso!');
+                                } else {
+                                    const errorData = await resp.json();
+                                    alert(`Erro ao excluir funcionário: ${errorData.message || 'Erro desconhecido'}`);
+                                }
+                            } catch (error) {
+                                console.error('Erro ao excluir:', error);
+                                alert('Erro ao excluir funcionário.');
+                            }
+                        }
 
-            // Listar funcionários na tabela
-            async function listarFuncionarios() {
-                try {
-                const resp = await fetch('/api/funcionarios');
-                if (!resp.ok) throw new Error('Erro ao carregar funcionários');
-                const data = await resp.json();
-                const tbody = document.getElementById('funcionarios-tbody');
-                tbody.innerHTML = '';
+                        // Enviar cadastro do funcionário
+                        document.getElementById('form-cadastro').addEventListener('submit', async e => {
+                            e.preventDefault();
+                            const uid = document.getElementById('rfiduid').value.trim();
+                            const nome = document.getElementById('nome').value.trim();
+                            const cargo = document.getElementById('cargo').value.trim();
 
-                data.forEach(f => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                    <td>${f.rfiduid}</td>
-                    <td>${f.nome}</td>
-                    <td>${f.cargo}</td>
-                    <td><button style="background:#7d1212" onclick="excluir('${f.rfiduid}')">Excluir</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-                } catch (err) {
-                console.error(err);
-                }
-            }
+                            if (!uid) {
+                            alert('UID não detectado. Digite o UID manualmente.');
+                            }
 
-            // Excluir funcionário pelo UID
-            async function excluir(uid) {
-                if (!confirm('Deseja realmente excluir este funcionário?')) return;
-                try {
-                const resp = await fetch(`/api/funcionarios/deletar/${uid}`, {
-                    method: 'DELETE'
-                });
-                if (!resp.ok) throw new Error('Erro ao excluir funcionário');
-                listarFuncionarios();
-                } catch (err) {
-                alert(err.message);
-                }
-            }
+                            const funcionario = { rfiduid: uid, nome, cargo };
 
-            // Enviar cadastro do funcionário
-            document.getElementById('form-cadastro').addEventListener('submit', async e => {
-                e.preventDefault();
-                const uid = document.getElementById('rfiduid').value.trim();
-                const nome = document.getElementById('nome').value.trim();
-                const cargo = document.getElementById('cargo').value.trim();
+                             try {
+                                const response = await fetch('/api/funcionarios/cadastrar', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(funcionario)
+                                });
 
-                if (!uid) {
-                alert('UID não detectado. Aproxime o cartão e tente novamente.');
-                return;
-                }
+                                if (response.ok) {
+                                    const newFuncionario = await response.json();
+                                    document.getElementById('mensagem-cadastro').textContent = 'Funcionário cadastrado com sucesso!';
+                                    setTimeout(() => {
+                                        esconderFormulario();
+                                        listarFuncionarios();
+                                    }, 1500);
+                                } else {
+                                    const errorData = await response.json();
+                                    alert(`Erro ao cadastrar funcionário: ${errorData.message || 'Erro desconhecido'}`);
+                                }
+                            } catch (error) {
+                                console.error('Erro ao cadastrar:', error);
+                                alert('Erro ao cadastrar funcionário.');
+                            }
+                        });
 
-                const funcionario = { rfiduid: uid, nome, cargo };
+                        // Inicializar lista ao carregar a página
+                        listarFuncionarios();
 
-                try {
-                // Registrar UID no backend (garante que modo cadastro está ativo)
-                let resp = await fetch('/api/funcionarios/registrarUid', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: uid
-                });
-                if (!resp.ok) {
-                    const erro = await resp.text();
-                    throw new Error(erro || 'Falha ao registrar UID');
-                }
+                        //Permitir edição do campo UID
+                        document.getElementById('rfiduid').removeAttribute('readonly');
+                        </script>
 
-                // Cadastrar funcionário com dados JSON
-                resp = await fetch('/api/funcionarios/cadastrar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(funcionario)
-                });
-                if (!resp.ok) throw new Error('Erro ao cadastrar funcionário');
-
-                document.getElementById('mensagem-cadastro').textContent = 'Funcionário cadastrado com sucesso!';
-                clearInterval(window.uidInterval);
-                setTimeout(() => {
-                    esconderFormulario();
-                    listarFuncionarios();
-                }, 1500);
-
-                } catch (err) {
-                alert(err.message);
-                }
-            });
-
-            // Inicializar lista ao carregar a página
-            listarFuncionarios();
-            </script>
         </body>
         </html>

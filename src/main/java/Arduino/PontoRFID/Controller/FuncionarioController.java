@@ -58,13 +58,17 @@ public class FuncionarioController {
     }
     return ResponseEntity.ok(uid);
 }
-
-    @PostMapping("/cadastrar")
-    public String cadastrarFuncionario(@RequestBody Funcionario funcionario){
-        FuncionarioRepository.save(funcionario);
-          rfidMode.setUltimoRfidUid("");
-        return "redirect:/funcionarios";
+@PostMapping("/cadastrar")
+public ResponseEntity<?> cadastrarFuncionario(@RequestBody Funcionario funcionario){
+    try {
+        Funcionario saved = FuncionarioRepository.save(funcionario);
+        return ResponseEntity.status(201).body(saved);
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Erro ao cadastrar: " + e.getMessage());
     }
+}
+
+    
     @DeleteMapping("/deletar/{rfiduid}")
     public ResponseEntity<?> excluirFuncionario(@PathVariable String rfiduid) {
         FuncionarioRepository.deleteById(rfiduid);
