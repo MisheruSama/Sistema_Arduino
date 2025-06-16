@@ -17,7 +17,6 @@ const String baseURL = "http://192.168.99.54:8080/api/historico";
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
-bool lastWasEntrada = true;
 
 void buzzerBeep(int duration) {
   digitalWrite(BUZZER_PIN, HIGH);
@@ -73,13 +72,10 @@ void registrarPonto(String codigoRFID) {
   strftime(dataStr, sizeof(dataStr), "%Y-%m-%d", &timeinfo);
   strftime(horaStr, sizeof(horaStr), "%H:%M:%S", &timeinfo);
 
-  String status = lastWasEntrada ? "entrada" : "saida";
-  lastWasEntrada = !lastWasEntrada;
 
   StaticJsonDocument<512> doc;
   doc["dataderegistro"] = dataStr;
   doc["horario"] = horaStr;
-  doc["status"] = status;
 
   JsonObject funcionario = doc.createNestedObject("funcionario");
   funcionario["rfiduid"] = codigoRFID;
@@ -131,5 +127,4 @@ void loop() {
   mfrc522.PICC_HaltA();
   mfrc522.PCD_StopCrypto1();
 }
-
 

@@ -67,19 +67,28 @@
             background: #3a2fcf;
         }
         #formulario-cadastro {
-            display: none;
-            justify-content: center;
-            margin-top: 32px;
-        }
+        display: none;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Fundo escuro transparente */
+        z-index: 999;
+}
         #form-cadastro {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            background: #22127d;
-            padding: 28px 24px;
-            border-radius: 8px;
-            min-width: 320px;
-        }
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #22127d;
+    padding: 28px 24px;
+    border-radius: 8px;
+    min-width: 320px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
         #form-cadastro input {
             padding: 10px;
             border-radius: 4px;
@@ -96,13 +105,13 @@
         }
         #form-cadastro button {
             background: #fff;
-            color: #22127d;
+            color: #0bbfd3;
             border: none;
             padding: 8px 20px;
             border-radius: 4px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s, color 0.2s;
+            transition: background 0.5s, color 0.5s;
         }
         #form-cadastro button:hover {
             background: #3a2fcf;
@@ -134,7 +143,9 @@
                     <th>UID</th>
                     <th>Nome</th>
                     <th>Cargo</th>
+                    <th>Status</th>
                     <th>Ações</th>
+                    
                 </tr>
             </thead>
             <tbody id="funcionarios-tbody">
@@ -196,7 +207,8 @@
                                 <td>${f.rfiduid}</td>
                                 <td>${f.nome}</td>
                                 <td>${f.cargo}</td>
-                                <td><button style="background:#7d1212" onclick="excluir('${f.rfiduid}')">Excluir</button></td>
+                                <td>${f.status}</td>
+                                <td><button style="background:#7d1212" onclick="excluir('${f.rfiduid}')">Demitir</button></td>
                                 `;
                                 tbody.appendChild(tr);
                             });
@@ -205,25 +217,30 @@
                             }
                         }
 
-                       async function excluir(uid) {
-                            if (!confirm('Deseja realmente excluir este funcionário?')) return;
+                      async function excluir(uid) {
+                        if (!confirm('Deseja realmente demitir este funcionário?')) return;
                             try {
-                                const resp = await fetch(`/api/funcionarios/deletar/${uid}`, {
-                                    method: 'DELETE',
-                                });
+                                 const resp = await fetch(`/api/funcionarios/demitir`, {
+                                    method: 'POST',
+                                    headers: {
+                                    'Content-Type': 'application/json',
+                                     },
+                                  body: JSON.stringify({ rfiduid: uid })
+                                     });
 
-                                if (resp.ok) {
-                                    listarFuncionarios();
-                                    alert('Funcionário excluído com sucesso!');
-                                } else {
-                                    const errorData = await resp.json();
-                                    alert(`Erro ao excluir funcionário: ${errorData.message || 'Erro desconhecido'}`);
-                                }
-                            } catch (error) {
-                                console.error('Erro ao excluir:', error);
-                                alert('Erro ao excluir funcionário.');
-                            }
-                        }
+                                     if (resp.ok) {
+                                      listarFuncionarios();
+                                      alert('Funcionário demitido com sucesso!');
+                                          } else {
+                                                const errorData = await resp.text();
+                                                 alert(`Erro ao demitir funcionário: ${errorData}`);
+                                             }
+                                 } catch (error) {
+                                     console.error('Erro ao demitir:', error);
+                                        alert('Erro ao demitir funcionário.');
+    }
+}
+
 
                         // Enviar cadastro do funcionário
                         document.getElementById('form-cadastro').addEventListener('submit', async e => {

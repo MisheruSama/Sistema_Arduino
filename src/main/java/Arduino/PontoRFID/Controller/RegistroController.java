@@ -34,15 +34,27 @@ public class RegistroController {
 public ResponseEntity<String> registrarPonto(@RequestBody RegistroPonto registroPonto) {
     String codigoRfid = registroPonto.getFuncionario().getRfiduid();
    Optional<Funcionario> funcionario = FuncionarioRepository.findById(codigoRfid);
-
+    
 
     if (funcionario.isPresent()) {
         registroPonto.setFuncionario(funcionario.get());
+         // Busca o último registro desse funcionário
+        RegistroPonto ultimoRegistro = registroPontoRepository.findTopByFuncionarioOrderByDataderegistroDescHorarioDesc(funcionario.get());
+
+        // Define o status com base no último registro
+        String statusCalculado = (ultimoRegistro == null || "saida".equals(ultimoRegistro.getStatus()))
+            ? "entrada"
+            : "saida";
+
+        registroPonto.setStatus(statusCalculado);
+
         registroPontoRepository.save(registroPonto);
-        return ResponseEntity.ok("Ponto registrado com sucesso.");
+
+        return ResponseEntity.ok("Ponto registrado como: " + statusCalculado);
     } else {
         return ResponseEntity.status(400).body("Funcionário não cadastrado.");
     }
+
 }
 
 }

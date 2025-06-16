@@ -28,6 +28,7 @@ public class Funcionario {
     private String rfiduid;
     private String nome;
     private String cargo;
+    private String status;
 
     @OneToMany(mappedBy = "funcionario")
     @JsonIgnoreProperties({"funcionario"})
