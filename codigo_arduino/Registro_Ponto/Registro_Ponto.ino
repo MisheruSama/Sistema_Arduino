@@ -13,7 +13,7 @@
 
 const char* ssid = "Michel";
 const char* password = "michel070";
-const String baseURL = "http://192.168.99.54:8080/api/historico";
+const String baseURL = "http://192.168.176.54:8080/api/historico";
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
@@ -60,7 +60,6 @@ void registrarPonto(String codigoRFID) {
 
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
-    Serial.println("Falha ao obter tempo");
     lcd.clear();
     lcd.print("Erro hora");
     buzzerBeep(200);
@@ -72,11 +71,9 @@ void registrarPonto(String codigoRFID) {
   strftime(dataStr, sizeof(dataStr), "%Y-%m-%d", &timeinfo);
   strftime(horaStr, sizeof(horaStr), "%H:%M:%S", &timeinfo);
 
-
   StaticJsonDocument<512> doc;
   doc["dataderegistro"] = dataStr;
   doc["horario"] = horaStr;
-
   JsonObject funcionario = doc.createNestedObject("funcionario");
   funcionario["rfiduid"] = codigoRFID;
 
@@ -101,6 +98,7 @@ void registrarPonto(String codigoRFID) {
     lcd.print("Erro ponto");
     buzzerBeep(1000);
   }
+
   http.end();
 }
 
@@ -109,11 +107,15 @@ void loop() {
     return;
   }
 
-  String rfidUID = "";
-  for (byte i = 0; i < mfrc522.uid.size; i++) {
-    rfidUID += String(mfrc522.uid.uidByte[i], HEX);
-  }
-  rfidUID.toUpperCase();
+String tempUID = "";
+for (byte i = 0; i < mfrc522.uid.size; i++) {
+  if (mfrc522.uid.uidByte[i] < 0x10) tempUID += "0";
+  tempUID += String(mfrc522.uid.uidByte[i], HEX);
+}
+tempUID.toUpperCase();
+String rfidUID = tempUID;
+
+
   Serial.println("RFID: " + rfidUID);
 
   lcd.clear();
@@ -127,4 +129,3 @@ void loop() {
   mfrc522.PICC_HaltA();
   mfrc522.PCD_StopCrypto1();
 }
-

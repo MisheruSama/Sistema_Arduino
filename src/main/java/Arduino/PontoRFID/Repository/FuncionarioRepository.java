@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import Arduino.PontoRFID.Model.Funcionario;
 
 public interface FuncionarioRepository extends JpaRepository<Funcionario, String>{
+     Funcionario findByRfiduid(String rfiduid);
 }

@@ -5,7 +5,6 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,14 +28,13 @@ import lombok.Setter;
 public class RegistroPonto {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "data_de_registro")
     private LocalDate dataderegistro;
     private LocalTime horario;
     private String status;
     
     @ManyToOne(fetch = FetchType.EAGER)   
-     @JoinColumn(name = "fk_Funcionario_rfiduid")
-    @JsonIgnoreProperties("registros")
+     @JoinColumn(name = "fk_funcionario_rfiduid")
+    @JsonIgnoreProperties("registroPontos")
     private Funcionario funcionario;
     
     

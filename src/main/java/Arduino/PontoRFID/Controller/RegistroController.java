@@ -22,39 +22,39 @@ public class RegistroController {
 
     @Autowired
     private RegistroPontoRepository registroPontoRepository;
+
     @Autowired
-    private FuncionarioRepository FuncionarioRepository;
+    private FuncionarioRepository funcionarioRepository;
 
     @GetMapping
-    public List<RegistroPonto> listarRegistro(){
-        List<RegistroPonto> registros = registroPontoRepository.findAll();
-        return registros;
+    public List<RegistroPonto> listarRegistro() {
+        return registroPontoRepository.findAll();
     }
-   @PostMapping("/registrar")
+
+    @PostMapping("/registrar")
 public ResponseEntity<String> registrarPonto(@RequestBody RegistroPonto registroPonto) {
-    String codigoRfid = registroPonto.getFuncionario().getRfiduid();
-   Optional<Funcionario> funcionario = FuncionarioRepository.findById(codigoRfid);
-    
+    String codigoRfid = registroPonto.getFuncionario().getRfiduid().toUpperCase();
 
-    if (funcionario.isPresent()) {
-        registroPonto.setFuncionario(funcionario.get());
-         // Busca o último registro desse funcionário
-        RegistroPonto ultimoRegistro = registroPontoRepository.findTopByFuncionarioOrderByDataderegistroDescHorarioDesc(funcionario.get());
+    Optional<Funcionario> funcionario = funcionarioRepository.findById(codigoRfid);
 
-        // Define o status com base no último registro
-        String statusCalculado = (ultimoRegistro == null || "saida".equals(ultimoRegistro.getStatus()))
-            ? "entrada"
-            : "saida";
-
-        registroPonto.setStatus(statusCalculado);
-
-        registroPontoRepository.save(registroPonto);
-
-        return ResponseEntity.ok("Ponto registrado como: " + statusCalculado);
-    } else {
+    if (funcionario.isEmpty()) {
         return ResponseEntity.status(400).body("Funcionário não cadastrado.");
     }
 
+    registroPonto.setFuncionario(funcionario.get());
+
+    RegistroPonto ultimoRegistro = registroPontoRepository
+        .findTopByFuncionarioOrderByDataderegistroDescHorarioDesc(funcionario.get());
+
+    String statusCalculado = (ultimoRegistro == null || "saida".equalsIgnoreCase(ultimoRegistro.getStatus()))
+        ? "entrada"
+        : "saida";
+
+    registroPonto.setStatus(statusCalculado);
+
+    registroPontoRepository.save(registroPonto);
+
+    return ResponseEntity.ok("Ponto registrado como: " + statusCalculado);
 }
 
 }

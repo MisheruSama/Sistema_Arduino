@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import Arduino.PontoRFID.Model.Funcionario;
-import Arduino.PontoRFID.Model.RFIDMode;
 import Arduino.PontoRFID.Repository.FuncionarioRepository;
 
 
@@ -24,42 +23,14 @@ public class FuncionarioController {
     
     @Autowired //Anotação para injetar a dependência do repositório de funcionários
     private FuncionarioRepository FuncionarioRepository;
-    @Autowired
-    private RFIDMode rfidMode;
-
-   @PostMapping("/modoCadastro")
-   //metodo para usar o cadastro
-    public ResponseEntity<String> ativarCadastro(){
-        rfidMode.setCadastro(true);
-        return ResponseEntity.ok("Modo de cadastro ativado.");
-    }
+    
     //metodo para pegar todos os funcionarios do banco de dados
     @GetMapping
     public List<Funcionario> ListarFuncionarios(){
         List<Funcionario> funcionarios = FuncionarioRepository.findAll();
         return funcionarios;
     }
-      @PostMapping("/registrarUid")
-    public ResponseEntity<String> registrarUid(@RequestBody String uid) {
-        if(rfidMode.isCadastro()) {
-            rfidMode.setUltimoRfidUid(uid);
-                rfidMode.setCadastro(false);   
-            return ResponseEntity.ok("UID registrado.");
-            
-        } else {
-            return ResponseEntity.status(400).body("Modo cadastro não ativado.");
-        }
-    }
 
-    // Frontend chama para pegar o último UID lido
-    @GetMapping("/ultimoUid")
-    public ResponseEntity<String> getUltimoUid() {
-            String uid = rfidMode.getUltimoRfidUid();
-    if (uid == null || uid.isEmpty()) {
-        return ResponseEntity.noContent().build();
-    }
-    return ResponseEntity.ok(uid);
-}
 //Endpoint para cadastrar os funcionários
 @PostMapping("/cadastrar")
 public ResponseEntity<?> cadastrarFuncionario(@RequestBody Funcionario funcionario){
