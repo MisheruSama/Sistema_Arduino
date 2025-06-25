@@ -11,9 +11,9 @@
 #define RST_PIN 4
 #define BUZZER_PIN 14
 
-const char* ssid = "Michel";
-const char* password = "michel070";
-const String baseURL = "http://192.168.122.54:8080/api/historico";
+const char* ssid = "NOME_REDE";
+const char* password = "SENHA_REDE";
+const String baseURL = "http://SEU_IP:SUA_PORTA/api/historico";
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
