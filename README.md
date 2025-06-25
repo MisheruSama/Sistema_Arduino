@@ -49,7 +49,6 @@ Este projeto tem como objetivo desenvolver um sistema de ponto eletrônico basea
 | RST      | GPIO 4    |
 | 3.3V     | 3.3V      |
 
-![Esquema de Montagem](imagens/esquema_ligacoes.png)
 
 ---
 
@@ -58,9 +57,8 @@ Este projeto tem como objetivo desenvolver um sistema de ponto eletrônico basea
 ```
 Sistema_Arduino/
 ├── sketch/                 # Códigos Arduino
-│   └── main.ino            # Lógica principal do ESP32
-├── imagens/                # Imagens de teste e demonstração
-├── backend/                # (Opcional - API Java/Spring se estiver no mesmo repositório)
+│   └── Registro_Ponto.ino  # Lógica principal do ESP32
+├── backend/                # (API Java/Spring)
 └── README.md               # Este arquivo
 ```
 
@@ -70,7 +68,7 @@ Sistema_Arduino/
 
 ### ESP32 (Arduino)
 
-1. Abra o arquivo `main.ino` no Arduino IDE.
+1. Abra o arquivo `Registro_Ponto.ino` no Arduino IDE.
 2. Instale as bibliotecas:
    - `MFRC522`
    - `WiFi`
@@ -91,8 +89,7 @@ Sistema_Arduino/
 ## 🧪 Exemplo de Resposta no LCD
 
 ```text
-TAG LIDA: 73938FEC
-PONTO REGISTRADO!
+PONTO OK!
 ```
 
 ---
@@ -121,8 +118,11 @@ Caso esteja usando a API desenvolvida junto, ela deve:
 
 | Nome            | Função                |
 |-----------------|------------------------|
+| Luiza Campos | Líder e Organizadora do Projeto |
 | Michel Germano  | Código Arduino & Backend |
-| Diego (exemplo) | Apoio & Testes        |
+| Matheus Avila | Montagem dos Componentes Físicos do Projeto |
+| Felipe Damazio | Documentação e Desevenvolvimento do Projeto |
+| Mariana de Oliveira | Produção de roteiro e Montagem do Projeto |
 
 ---
 
