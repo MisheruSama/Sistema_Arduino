@@ -47,8 +47,8 @@ public ResponseEntity<String> registrarPonto(@RequestBody RegistroPonto registro
         .findTopByFuncionarioOrderByDataderegistroDescHorarioDesc(funcionario.get());
 
     String statusCalculado = (ultimoRegistro == null || "saida".equalsIgnoreCase(ultimoRegistro.getStatus()))
-        ? "entrada"
-        : "saida";
+        ? "Entrada"
+        : "Saida";
 
     registroPonto.setStatus(statusCalculado);
 

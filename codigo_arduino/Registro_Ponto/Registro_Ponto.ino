@@ -13,7 +13,7 @@
 
 const char* ssid = "Michel";
 const char* password = "michel070";
-const String baseURL = "http://192.168.176.54:8080/api/historico";
+const String baseURL = "http://192.168.122.54:8080/api/historico";
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
