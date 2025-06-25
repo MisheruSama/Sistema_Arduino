@@ -21,7 +21,8 @@ Este projeto tem como objetivo desenvolver um sistema de ponto eletrônico basea
 - Java + Spring Boot (REST API)
 - PostgreSQL
 
-![Esquema de Funcionamento](imagens/fluxograma.png)
+![Esquema de Funcionamento](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYorJFc19YM_HbNW9IVrqmA_7sPBWlMHfHdQ&s)
+
 
 ---
 
